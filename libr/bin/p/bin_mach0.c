@@ -22,15 +22,11 @@ static Sdb* get_sdb (RBinFile *bf) {
 }
 
 static char *entitlements(RBinFile *bf, bool json) {
-	struct MACH0_(obj_t) *bin;
 	if (!bf || !bf->o || json) {
 		return NULL;
 	}
-	bin = bf->o->bin_obj;
-	if (!bin->signature) {
-		return NULL;
-	}
-	return strdup ((char*) bin->signature);
+	struct MACH0_(obj_t) *bin = bf->o->bin_obj;
+	return bin->signature? strdup ((char*) bin->signature): NULL;
 }
 
 static bool load_bytes(RBinFile *bf, void **bin_obj, const ut8 *buf, ut64 sz, ut64 loadaddr, Sdb *sdb){
@@ -565,6 +561,9 @@ static RBinInfo* info(RBinFile *bf) {
 		ret->has_crypto = ((struct MACH0_(obj_t)*)
 			bf->o->bin_obj)->has_crypto;
 		ret->bits = MACH0_(get_bits) (bf->o->bin_obj);
+	}
+	if (!strcmp (ret->arch, "arm") && ret->bits == 16) {
+		ret->cpu = strdup ("cortex");
 	}
 	ret->has_va = true;
 	ret->has_pi = MACH0_(is_pie) (bf->o->bin_obj);
