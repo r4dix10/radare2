@@ -7672,7 +7672,7 @@ static void cmd_anal_class_method(RCore *core, const char *input) {
 			}
 
 			meth->addr = addr;
-			meth->vtable_index = vtable_index;
+			meth->vtable_offset = vtable_index;
 
 			free (cstr);
 			break;
